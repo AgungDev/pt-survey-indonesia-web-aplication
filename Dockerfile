@@ -28,6 +28,8 @@ COPY composer.json composer.lock package.json ./
 RUN composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-gd --ignore-platform-req=ext-zip --no-scripts
 
 COPY . ./
+COPY docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 # Install JS dependencies and build assets after source files are present
 RUN npm install --legacy-peer-deps && npm run build || true
 
@@ -36,4 +38,5 @@ RUN composer dump-autoload --optimize && php artisan package:discover --ansi
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 EXPOSE 9000
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["php-fpm"]

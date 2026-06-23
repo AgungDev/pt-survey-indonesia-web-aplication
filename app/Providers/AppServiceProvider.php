@@ -19,6 +19,7 @@ use App\Application\Services\MenuService;
 use App\Application\Services\ThemeService;
 use App\Infrastructure\Persistence\Eloquent\Repositories\UserRepository;
 use App\Models\Inspection;
+use App\Providers\ImageServiceProvider;
 use App\Policies\InspectionPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
@@ -41,6 +42,8 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(ThemeService::class, fn () => new ThemeService(config('themes', [])));
         $this->app->singleton(MenuService::class, fn () => new MenuService());
+
+        $this->app->register(ImageServiceProvider::class);
     }
 
     /**

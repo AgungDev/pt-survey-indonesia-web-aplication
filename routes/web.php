@@ -26,6 +26,10 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::get('/logout', function () {
+    // Redirect GET requests to login with a message
+    return redirect('/login')->with('error', 'Please use the logout button to sign out.');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
