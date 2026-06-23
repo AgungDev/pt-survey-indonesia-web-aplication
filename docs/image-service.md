@@ -1,80 +1,124 @@
 # Image Service
 
-Layanan ini menyediakan seluruh proses pengolahan gambar melalui service layer dan Clean Architecture.
+Dokumentasi singkat Image Service berdasarkan implementasi yang sudah ada.
 
-## Struktur penting
+## Lokasi penting
 
-- `App\Domain\Image\Contracts\ImageServiceInterface`
-- `App\Application\Image\Services\ImageService`
-- `App\Infrastructure\Image\Processors\ImageProcessor`
-- `App\Infrastructure\Image\Drivers\LocalImageStorage`
-- `App\Providers\ImageServiceProvider`
+- `app/Domain/Image/Contracts/ImageServiceInterface.php`
+- `app/Application/Image/Services/ImageService.php`
+- `app/Infrastructure/Image/Processors/ImageProcessor.php`
+- `app/Infrastructure/Image/Drivers/LocalImageStorage.php`
+- `app/Infrastructure/Image/Drivers/MinioImageStorage.php`
+- `app/Infrastructure/Image/Drivers/S3ImageStorage.php`
+- `app/Application/Image/DTOs/ImageUploadDTO.php`
+- `app/Application/Image/DTOs/ImageMetadataDTO.php`
+- `app/Application/Image/DTOs/ImageProcessDTO.php`
+- `app/Application/Image/Exceptions/InvalidImageException.php`
+- `app/Application/Image/Exceptions/UnsupportedFormatException.php`
+- `app/Application/Image/Exceptions/ImageProcessingException.php`
+- `app/Jobs/ProcessImageJob.php`
+- `app/Providers/ImageServiceProvider.php`
 - `config/image.php`
 
-## Install dependensi
+## Fitur yang tersedia
 
-Jalankan:
-
-```bash
-composer require intervention/image
-```
+- compress image ke format default (`webp`) lewat `compress()`
+- resize image dengan proporsi yang terjaga lewat `resize()`
+- convert format image lewat `convert()`
+- generate thumbnail standar lewat `generateThumbnail()`
+- generate responsive images (`thumbnail`, `small`, `medium`, `large`) lewat `generateResponsiveImages()`
+- optimize upload workflow lewat `optimize()`
+- delete image lewat `delete()`
+- replace image lama lewat `replace()`
+- baca metadata lewat `getMetadata()`
+- deteksi duplikat via checksum SHA256 lewat `calculateChecksum()`
+- generate public URL lewat `generateUrl()`
 
 ## Konfigurasi
 
-`config/image.php` sudah menyediakan nilai default:
+`config/image.php` berisi:
 
+- `driver`: image driver (`gd` default)
 - `default_format`: `webp`
 - `quality`: `80`
 - `thumbnail_quality`: `70`
 - `thumbnail_width`: `400`
 - `thumbnail_height`: `300`
+- `responsive_sizes`: ukuran responsive image
+- `storage_disk`: disk Laravel untuk menyimpan file (default `public`)
+- `supported_input_formats`: `jpg`, `jpeg`, `png`, `webp`, `bmp`, `gif`, `avif`, `heic`
+- `supported_output_formats`: `jpg`, `png`, `webp`
 - `base_path`: `uploads`
-- `responsive_sizes`: `thumbnail`, `small`, `medium`, `large`
 
-## Cara menggunakan
+## Cara pakai
 
-### Injeksi service di controller
+### Injeksi service di controller / use case
 
 ```php
 use App\Domain\Image\Contracts\ImageServiceInterface;
 
-class ProfileController
+class ExampleController
 {
-    public function updateAvatar(ImageServiceInterface $imageService)
+    public function store(ImageServiceInterface $imageService)
     {
-        $image = request()->file('avatar');
-        $metadata = $imageService->optimize($image);
+        $uploaded = request()->file('image');
+        $metadata = $imageService->optimize($uploaded);
 
         return response()->json($metadata->toArray());
     }
 }
 ```
 
-### Contoh pemanggilan metode service
+### Contoh penggunaan metode
 
 ```php
-$imageService->compress('uploads/originals/9f3a7b0d.jpg', 75);
-$imageService->resize('uploads/originals/9f3a7b0d.jpg', 800, 600);
-$imageService->convert('uploads/originals/9f3a7b0d.jpg', 'webp');
-$imageService->generateThumbnail('uploads/optimized/9f3a7b0d.webp');
-$imageService->generateResponsiveImages('uploads/optimized/9f3a7b0d.webp');
-$imageService->delete('uploads/optimized/9f3a7b0d.webp');
-$imageService->replace('uploads/optimized/old.webp', 'uploads/originals/new.jpg');
-$imageService->getMetadata('uploads/optimized/9f3a7b0d.webp');
-$imageService->calculateChecksum('uploads/optimized/9f3a7b0d.webp');
-$imageService->generateUrl('uploads/optimized/9f3a7b0d.webp');
+$metadata = $imageService->compress('uploads/originals/1234.jpg', 75);
+$metadata = $imageService->resize('uploads/originals/1234.jpg', 800, 600);
+$metadata = $imageService->convert('uploads/originals/1234.jpg', 'webp');
+$thumbnail = $imageService->generateThumbnail('uploads/originals/1234.jpg');
+$responsive = $imageService->generateResponsiveImages('uploads/originals/1234.jpg');
+$imageService->delete('uploads/optimized/abcd.webp');
+$metadata = $imageService->replace('uploads/optimized/old.webp', 'uploads/originals/new.jpg');
+$metadata = $imageService->getMetadata('uploads/optimized/abcd.webp');
+$checksum = $imageService->calculateChecksum('uploads/optimized/abcd.webp');
+$url = $imageService->generateUrl('uploads/optimized/abcd.webp');
 ```
 
-## Proses antrean
+## Queue integration
 
-`App\Jobs\ProcessImageJob` sudah tersedia untuk dipakai dengan queue Redis.
+`App\Jobs\ProcessImageJob` sudah tersedia untuk queue Redis:
 
 ```php
-ProcessImageJob::dispatch('uploads/originals/9f3a7b0d.jpg');
+ProcessImageJob::dispatch('uploads/originals/1234.jpg');
 ```
 
-## Notes
+Job ini memanggil `ImageService::optimize()` dan menjalankan compress, thumbnail, responsive image, dan penyimpanan final.
 
-- Semua logika pengolahan gambar berada di service layer, bukan di controller.
-- `LocalImageStorage` menyimpan file di disk `public` dan menghasilkan URL via `Storage::disk('public')->url()`.
-- Duplikasi gambar dideteksi dengan checksum SHA256 dan disimpan di cache.
+## Tempat penggunaan yang disarankan
+
+- Controller upload image (user profile, inspection, findings, equipment)
+- Use case / service layer lain yang butuh transformasi gambar
+- Job queue untuk pemrosesan async
+- Module image handling lintas aplikasi seperti profile, equipment, inspection, atau dokumentasi
+
+## Cara cek fitur
+
+- Pastikan `App\Providers\ImageServiceProvider` terdaftar di `App\Providers\AppServiceProvider`.
+- Pastikan `config/image.php` sudah ada dan `intervention/image` terinstal.
+- Pastikan disk `public` sudah tersedia dan `php artisan storage:link` dijalankan bila perlu.
+- Jalankan tes unit/feature:
+  - `php artisan test --filter ImageDTOTest`
+  - `php artisan test --filter ImageServiceFeatureTest`
+
+## Error handling
+
+- Input format yang tidak didukung akan melempar `UnsupportedFormatException`
+- Path gambar yang tidak bisa dibaca akan melempar `InvalidImageException`
+- Gagal membuka atau encode image akan melempar `ImageProcessingException`
+- Duplikat image akan dicek menggunakan checksum SHA256 dan service akan mengembalikan file existing bila sudah disimpan sebelumnya
+
+## Catatan tambahan
+
+- `ImageService` saat ini menggunakan `LocalImageStorage` sebagai default.
+- Untuk menggunakan MinIO atau S3, ubah binding `ImageStorageInterface` di `app/Providers/ImageServiceProvider.php`.
+- Semua logika image processing sudah berada di service layer, bukan di controller.
