@@ -12,6 +12,10 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     curl \
+    gnupg \
+    dirmngr \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
     && docker-php-ext-configure gd --with-jpeg --with-freetype \
     && docker-php-ext-install pdo_pgsql zip gd bcmath pcntl sockets
 
@@ -20,10 +24,13 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 WORKDIR /var/www/html
 
-COPY composer.json composer.lock ./
+COPY composer.json composer.lock package.json ./
 RUN composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-gd --ignore-platform-req=ext-zip --no-scripts
 
 COPY . ./
+# Install JS dependencies and build assets after source files are present
+RUN npm install --legacy-peer-deps && npm run build || true
+
 RUN composer dump-autoload --optimize && php artisan package:discover --ansi
 
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache

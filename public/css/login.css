@@ -1,0 +1,107 @@
+:root {
+    --login-bg-top: #e7eefc;
+    --login-bg-bottom: #d6e5f8;
+    --login-panel: rgba(255, 255, 255, 0.96);
+    --login-primary: #0f5ec8;
+    --login-primary-dark: #0b4bb3;
+}
+
+.login-page {
+    background: radial-gradient(circle at top center, rgba(255,255,255,0.85), transparent 28%),
+        linear-gradient(180deg, var(--login-bg-top) 0%, var(--login-bg-bottom) 100%);
+}
+
+.login-box {
+    width: 100%;
+    max-width: 440px;
+    margin: 3.5rem auto;
+}
+
+.login-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.login-logo img {
+    width: 105px;
+    height: auto;
+}
+
+.login-logo-text {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: #053163;
+}
+
+.login-logo-text span {
+    display: block;
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: #3663a9;
+}
+
+.login-card {
+    border-radius: 1.25rem;
+    overflow: hidden;
+    border: 1px solid rgba(15, 94, 200, 0.12);
+    box-shadow: 0 24px 70px rgba(20, 63, 117, 0.12);
+    background: var(--login-panel);
+}
+
+.login-card .card-header {
+    background: transparent;
+    border-bottom: none;
+    padding-bottom: 0.5rem;
+    padding-top: 1.75rem;
+}
+
+.login-card .card-body {
+    padding: 2rem;
+}
+
+.login-box-msg {
+    margin-bottom: 1.5rem;
+    color: #3f5177;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.login-box .input-group-text {
+    background: rgba(15, 94, 200, 0.08);
+    border-color: #d9e4f4;
+    color: #0f5ec8;
+}
+
+.login-box .form-control:focus {
+    border-color: var(--login-primary);
+    box-shadow: 0 0 0 0.1rem rgba(15, 94, 200, 0.2);
+}
+
+.login-box .btn-primary {
+    background: var(--login-primary);
+    border-color: var(--login-primary);
+}
+
+.login-box .btn-primary:hover,
+.login-box .btn-primary:focus {
+    background: var(--login-primary-dark);
+    border-color: var(--login-primary-dark);
+}
+
+.login-box a {
+    color: #0f5ec8;
+}
+
+.login-box a:hover {
+    color: #0b4bb3;
+}
+
+.password-toggle {
+    cursor: pointer;
+    user-select: none;
+}

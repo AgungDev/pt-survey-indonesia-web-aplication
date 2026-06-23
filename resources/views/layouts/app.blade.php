@@ -1,61 +1,117 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ config('app.name', 'Survey Management') }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="{{ route('dashboard.index') }}">Survey Management</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                @auth
-                    <li class="nav-item"><a class="nav-link" href="{{ route('dashboard.index') }}">Dashboard</a></li>
-                    
-                    @if(in_array(auth()->user()->role?->name, ['Super Admin', 'Admin']))
-                        <li class="nav-item"><a class="nav-link" href="{{ route('imports.index') }}">Imports</a></li>
-                    @endif
-                    
-                    @if(in_array(auth()->user()->role?->name, ['Super Admin', 'Admin', 'Supervisor', 'Inspector']))
-                        <li class="nav-item"><a class="nav-link" href="{{ route('inspections.index') }}">Inspections</a></li>
-                    @endif
-                    
-                    @if(auth()->user()->role?->name === 'Inspector')
-                        <li class="nav-item"><a class="nav-link" href="{{ route('inspections.create') }}">New Inspection</a></li>
-                    @endif
-                @endauth
-            </ul>
-            <ul class="navbar-nav ms-auto">
-                @auth
-                    <li class="nav-item">
-                        <span class="nav-link">
-                            <small class="text-light">{{ auth()->user()->name }} ({{ auth()->user()->role?->name }})</small>
-                        </span>
-                    </li>
-                    <li class="nav-item">
-                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
-                        </form>
-                    </li>
-                @endauth
-            </ul>
-        </div>
-    </div>
-</nav>
-<div class="container py-4">
-    @if(session('status'))
-        <div class="alert alert-success">{{ session('status') }}</div>
+    <title>{{ config('app.name', 'Survey Management') }} | @yield('title', 'Dashboard')</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    @if(file_exists(public_path('build/manifest.json')))
+        @vite(['resources/css/app.css'])
+    @else
+        <!-- Vite manifest not found; using CDN fallback and custom CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/4.0.0/css/adminlte.min.css" />
+        <link rel="stylesheet" href="{{ asset('css/app.css') }}" />
     @endif
+    @stack('css')
+    @stack('styles')
+    <style>
+        .app-sidebar.sidebar-dark-primary {
+            background-color: #0d6efd !important;
+        }
+        .app-sidebar.sidebar-dark-warning {
+            background-color: #fd7e14 !important;
+        }
+        .app-sidebar.sidebar-dark-success {
+            background-color: #198754 !important;
+        }
+        .app-sidebar.sidebar-dark-info {
+            background-color: #0dcaf0 !important;
+        }
+        .app-sidebar.sidebar-dark-indigo {
+            background-color: #343a40 !important;
+        }
+        .app-sidebar.sidebar-dark-primary .brand-link,
+        .app-sidebar.sidebar-dark-warning .brand-link,
+        .app-sidebar.sidebar-dark-success .brand-link,
+        .app-sidebar.sidebar-dark-info .brand-link,
+        .app-sidebar.sidebar-dark-indigo .brand-link,
+        .app-sidebar.sidebar-dark-primary .nav-link,
+        .app-sidebar.sidebar-dark-warning .nav-link,
+        .app-sidebar.sidebar-dark-success .nav-link,
+        .app-sidebar.sidebar-dark-info .nav-link,
+        .app-sidebar.sidebar-dark-indigo .nav-link,
+        .app-sidebar.sidebar-dark-primary .nav-icon,
+        .app-sidebar.sidebar-dark-warning .nav-icon,
+        .app-sidebar.sidebar-dark-success .nav-icon,
+        .app-sidebar.sidebar-dark-info .nav-icon,
+        .app-sidebar.sidebar-dark-indigo .nav-icon {
+            color: #fff !important;
+        }
+        .app-sidebar.sidebar-dark-primary .nav-link.active {
+            background-color: rgba(13, 110, 253, 0.75) !important;
+        }
+        .app-sidebar.sidebar-dark-warning .nav-link.active {
+            background-color: rgba(253, 126, 20, 0.75) !important;
+        }
+        .app-sidebar.sidebar-dark-success .nav-link.active {
+            background-color: rgba(25, 135, 84, 0.75) !important;
+        }
+        .app-sidebar.sidebar-dark-info .nav-link.active {
+            background-color: rgba(13, 202, 240, 0.75) !important;
+        }
+        .app-sidebar.sidebar-dark-indigo .nav-link.active {
+            background-color: rgba(79, 70, 229, 0.75) !important;
+        }
 
-    @yield('content')
+        .app-sidebar .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.25) !important;
+            color: #fff !important;
+            font-weight: 600 !important;
+            border-left: 4px solid rgba(255, 255, 255, 0.85) !important;
+        }
+    </style>
+</head>
+<body class="hold-transition layout-fixed sidebar-expand-lg bg-body-tertiary {{ $theme['body_class'] ?? '' }}">
+<div class="app-wrapper">
+    <x-navbar />
+    <x-sidebar />
+
+    <main class="app-main">
+        <div class="app-content-header">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h1 class="mb-0">@yield('page-title', 'Dashboard')</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        @hasSection('breadcrumb')
+                            @yield('breadcrumb')
+                        @else
+                            <x-breadcrumb :items="$breadcrumbs ?? []" />
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-content">
+            <div class="container-fluid">
+                <x-flash-message />
+                @yield('content')
+            </div>
+        </div>
+    </main>
+
+    <x-footer />
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+@if(file_exists(public_path('build/manifest.json')))
+    @vite(['resources/js/app.js'])
+@else
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/4.0.0/js/adminlte.min.js"></script>
+@endif
+@stack('js')
+@stack('scripts')
 </body>
 </html>

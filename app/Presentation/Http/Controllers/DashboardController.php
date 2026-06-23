@@ -18,15 +18,20 @@ class DashboardController extends Controller
 
         $summary = $this->dashboardService->summary();
 
+        $breadcrumbs = [
+            ['label' => 'Home', 'url' => route('dashboard.index')],
+            ['label' => 'Dashboard', 'url' => null],
+        ];
+
         // Determine which dashboard view to render based on role
         $view = match($role) {
-            'Super Admin' => 'dashboard.super-admin',
-            'Admin' => 'dashboard.admin',
-            'Supervisor' => 'dashboard.supervisor',
-            'Inspector' => 'dashboard.inspector',
-            default => 'dashboard'
+            'Super Admin' => 'pages.dashboard.super-admin',
+            'Admin' => 'pages.dashboard.admin',
+            'Supervisor' => 'pages.dashboard.supervisor',
+            'Inspector' => 'pages.dashboard.inspector',
+            default => 'pages.dashboard.index',
         };
 
-        return View::make($view, compact('summary', 'user', 'role'));
+        return View::make($view, compact('summary', 'user', 'role', 'breadcrumbs'));
     }
 }

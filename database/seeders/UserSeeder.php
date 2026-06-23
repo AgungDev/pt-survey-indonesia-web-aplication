@@ -21,14 +21,24 @@ class UserSeeder extends Seeder
 
         foreach ($users as $roleName => $data) {
             $role = $roles->get($roleName);
-            User::updateOrCreate(
-                ['email' => $data['email']],
-                [
+            
+            // Check if user exists
+            $user = User::where('email', $data['email'])->first();
+            
+            if ($user) {
+                // Update existing user with role
+                $user->update([
+                    'role_id' => $role?->id,
+                ]);
+            } else {
+                // Create new user with role
+                User::create([
                     'name' => $data['name'],
+                    'email' => $data['email'],
                     'password' => bcrypt('password'),
                     'role_id' => $role?->id,
-                ]
-            );
+                ]);
+            }
         }
     }
 }

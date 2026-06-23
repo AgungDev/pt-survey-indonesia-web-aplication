@@ -1,0 +1,105 @@
+.navbar-indigo {
+    background-color: #4f46e5 !important;
+    color: #fff !important;
+}
+
+.navbar-primary {
+    background-color: #0d6efd !important;
+    color: #fff !important;
+}
+
+.navbar-warning {
+    background-color: #fd7e14 !important;
+    color: #fff !important;
+}
+
+.navbar-success {
+    background-color: #198754 !important;
+    color: #fff !important;
+}
+
+.sidebar-dark-primary {
+    background-color: #0d6efd !important;
+}
+
+.sidebar-dark-warning {
+    background-color: #fd7e14 !important;
+}
+
+.sidebar-dark-success {
+    background-color: #198754 !important;
+}
+
+.sidebar-dark-info {
+    background-color: #0dcaf0 !important;
+}
+
+.sidebar-dark-indigo {
+    background-color: #343a40 !important;
+}
+
+.sidebar-dark-primary .brand-link,
+.sidebar-dark-primary .nav-link,
+.sidebar-dark-primary .nav-icon,
+.sidebar-dark-warning .brand-link,
+.sidebar-dark-warning .nav-link,
+.sidebar-dark-warning .nav-icon,
+.sidebar-dark-success .brand-link,
+.sidebar-dark-success .nav-link,
+.sidebar-dark-success .nav-icon,
+.sidebar-dark-info .brand-link,
+.sidebar-dark-info .nav-link,
+.sidebar-dark-info .nav-icon,
+.sidebar-dark-indigo .brand-link,
+.sidebar-dark-indigo .nav-link,
+.sidebar-dark-indigo .nav-icon {
+    color: #fff !important;
+}
+
+.sidebar-dark-primary .nav-link.active {
+    background-color: rgba(13, 110, 253, 0.75) !important;
+}
+
+.sidebar-dark-warning .nav-link.active {
+    background-color: rgba(253, 126, 20, 0.75) !important;
+}
+
+.sidebar-dark-success .nav-link.active {
+    background-color: rgba(25, 135, 84, 0.75) !important;
+}
+
+.sidebar-dark-info .nav-link.active {
+    background-color: rgba(13, 202, 240, 0.75) !important;
+}
+
+.sidebar-dark-indigo .nav-link.active {
+    background-color: rgba(79, 70, 229, 0.75) !important;
+}
+
+.app-sidebar .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    border-left: 3px solid rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Navbar active link styling for each theme */
+.navbar-primary .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.25) !important;
+    border-bottom: 3px solid #fff !important;
+}
+
+.navbar-warning .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.25) !important;
+    border-bottom: 3px solid #fff !important;
+}
+
+.navbar-success .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.25) !important;
+    border-bottom: 3px solid #fff !important;
+}
+
+.navbar-indigo .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.25) !important;
+    border-bottom: 3px solid #fff !important;
+}
