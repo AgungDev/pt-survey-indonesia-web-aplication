@@ -25,7 +25,7 @@ class InspectionRepository implements InspectionRepositoryInterface
 
     public function find(string $id): ?Inspection
     {
-        return Inspection::with(['equipment', 'findings', 'photos'])->find($id);
+        return Inspection::with(['equipment', 'inspector', 'findings.photos', 'photos'])->find($id);
     }
 
     public function create(array $data): Inspection

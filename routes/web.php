@@ -3,8 +3,10 @@
 use App\Presentation\Http\Controllers\Auth\ForgotPasswordController;
 use App\Presentation\Http\Controllers\Auth\LoginController;
 use App\Presentation\Http\Controllers\Auth\ResetPasswordController;
+use App\Presentation\Http\Controllers\CompanyController;
 use App\Presentation\Http\Controllers\DashboardController;
 use App\Presentation\Http\Controllers\ImportController;
+use App\Presentation\Http\Controllers\IndustryController;
 use App\Presentation\Http\Controllers\InspectionController;
 use App\Http\Controllers\DebugController;
 use Illuminate\Support\Facades\Route;
@@ -39,9 +41,21 @@ Route::middleware('auth')->group(function () {
         Route::get('/imports', [ImportController::class, 'index'])->name('imports.index');
         Route::post('/imports', [ImportController::class, 'store'])->name('imports.store');
         Route::view('/equipments', 'pages.equipments.index')->name('equipments.index');
+
+        Route::get('/industries', [IndustryController::class, 'index'])->name('industries.index');
+        Route::get('/industries/create', [IndustryController::class, 'create'])->name('industries.create');
+        Route::post('/industries', [IndustryController::class, 'store'])->name('industries.store');
+
+        Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
+        Route::get('/companies/create', [CompanyController::class, 'create'])->name('companies.create');
+        Route::post('/companies', [CompanyController::class, 'store'])->name('companies.store');
     });
 
     Route::middleware('role:Super Admin')->group(function () {
+        Route::get('/imports/{id}', [ImportController::class, 'show'])->name('imports.show');
+        Route::post('/imports/{id}/approve', [ImportController::class, 'approve'])->name('imports.approve');
+        Route::post('/imports/{id}/reject', [ImportController::class, 'reject'])->name('imports.reject');
+
         Route::view('/users', 'pages.users.index')->name('users.index');
         Route::view('/roles', 'pages.roles.index')->name('roles.index');
         Route::view('/settings', 'pages.settings.index')->name('settings.index');
@@ -57,6 +71,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/inspections/create', [InspectionController::class, 'create'])->name('inspections.create');
         Route::post('/inspections', [InspectionController::class, 'store'])->name('inspections.store');
     });
+
+    Route::get('/inspections/{id}', [InspectionController::class, 'show'])->name('inspections.show');
 
     Route::middleware('role:Super Admin,Supervisor')->group(function () {
         Route::post('/inspections/{id}/approve', [InspectionController::class, 'approve'])->name('inspections.approve');

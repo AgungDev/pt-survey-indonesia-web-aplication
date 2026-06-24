@@ -8,6 +8,7 @@ use App\Application\UseCases\CreateInspectionUseCase;
 use App\Domain\Repositories\EquipmentRepositoryInterface;
 use App\Domain\Repositories\InspectionRepositoryInterface;
 use App\Presentation\Http\Requests\StoreInspectionRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\View;
@@ -22,11 +23,32 @@ class InspectionController extends Controller
     ) {
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $inspections = $this->inspectionRepository->paginate([], 15);
+        $filters = [];
+
+        if ($request->filled('status')) {
+            $filters['status'] = $request->input('status');
+        }
+
+        if (Auth::user()->role?->name === 'Inspector') {
+            $filters['inspector_id'] = Auth::id();
+        }
+
+        $inspections = $this->inspectionRepository->paginate($filters, 15);
 
         return View::make('inspections.index', compact('inspections'));
+    }
+
+    public function show(string $id)
+    {
+        $inspection = $this->inspectionRepository->find($id);
+
+        if (!$inspection) {
+            return Redirect::route('inspections.index')->with('error', 'Inspection not found.');
+        }
+
+        return View::make('inspections.show', compact('inspection'));
     }
 
     public function create()

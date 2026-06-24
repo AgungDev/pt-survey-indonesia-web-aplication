@@ -37,8 +37,19 @@ class CreateInspectionUseCase
         ]);
 
         $findings = $this->findingRepository->createMany($dto->findings, $inspection->id);
+        $findingMap = [];
 
-        foreach ($dto->findingPhotos as $findingId => $files) {
+        foreach ($findings as $index => $finding) {
+            $findingMap[$index] = $finding->id;
+        }
+
+        foreach ($dto->findingPhotos as $findingIndex => $files) {
+            if (!isset($findingMap[$findingIndex])) {
+                continue;
+            }
+
+            $findingId = $findingMap[$findingIndex];
+
             foreach ($files as $file) {
                 if (!$file) {
                     continue;

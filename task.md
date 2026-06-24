@@ -1,389 +1,279 @@
-Saya ingin membuat aplikasi Survey & Inspection Management untuk industri menggunakan Laravel.
+Saya ingin melakukan refactor terhadap aplikasi Industrial Survey & Inspection yang sudah ada.
 
-## Tech Stack
+Saat ini sistem berfokus pada Equipment dan Inspection.
 
-* Laravel 12
-* PHP 8.4
-* PostgreSQL
-* Docker & Docker Compose
-* Bootstrap 5
-* Clean Architecture
-* Repository Pattern
-* Service Layer
-* UUID sebagai Primary Key
-* Laravel Authentication
-* Laravel Policy & Authorization
-* Queue Ready
-* Storage untuk upload foto
-* Import Excel menggunakan Laravel Excel (maatwebsite/excel)
-
----
-
-# Tujuan Sistem
-
-Aplikasi digunakan untuk:
-
-1. Import master data peralatan dari file Excel.
-2. Melakukan survey/inspeksi peralatan di lapangan.
-3. Menyimpan foto unit dan foto temuan.
-4. Menyimpan hasil pemeriksaan.
-5. Menghasilkan laporan inspeksi.
-6. Mendukung ribuan data peralatan dan inspeksi.
-
-Fokus versi awal (MVP):
-
-* User Management
-* Role Management
-* Import Excel
-* Survey/Inspection
-* Upload Foto
-* Dashboard
-
----
-
-# Arsitektur
+Saya ingin mengubah business flow menjadi berbasis organisasi industri.
 
 Gunakan Clean Architecture.
 
-Struktur folder:
-
-app/
-
-```
-Domain/
-    Entities/
-    Repositories/
-    ValueObjects/
-
-Application/
-    UseCases/
-    DTOs/
-    Services/
-
-Infrastructure/
-    Persistence/
-        Eloquent/
-        Repositories/
-    Storage/
-    Excel/
-
-Presentation/
-    Http/
-        Controllers/
-        Requests/
-        Resources/
-```
-
-Buat dependency inversion yang jelas.
-
-Controller tidak boleh mengakses model langsung.
-
-Controller -> UseCase -> Repository Interface -> Repository Implementation
-
----
-
-# Docker
-
-Buat docker compose lengkap:
-
-services:
-
-* nginx
-* app (php-fpm)
-* postgres
-* redis
-* pgadmin
-
-Tambahkan:
-
-* healthcheck
-* volume persistence
-* environment configuration
-
-Buat Dockerfile production-ready.
-
----
-
-# Authentication & Authorization
-
-Gunakan Laravel Authentication.
-
-Buat multi role:
-
-1. Super Admin
-2. Admin
-3. Supervisor
-4. Inspector
-
-Hak akses:
-
-Super Admin:
-
-* kelola semua user
-* kelola role
-* import data
-* lihat seluruh laporan
-
-Admin:
-
-* import data
-* kelola master data
-* lihat laporan
-
-Supervisor:
-
-* review inspeksi
-* approve inspeksi
-* lihat laporan
-
-Inspector:
-
-* input inspeksi
-* upload foto
-* edit inspeksi miliknya
+Jangan membuat business logic di Controller.
 
 Gunakan:
 
-* Policy
-* Middleware
-* Gates
-
----
-
-# Database Design
-
-Gunakan PostgreSQL.
-
-Semua tabel menggunakan UUID.
-
-## users
-
-* id
-* name
-* email
-* password
-* role_id
-* created_at
-* updated_at
-
-## roles
-
-* id
-* name
-* description
-
-## equipments
-
-Master data hasil import excel.
-
-Field:
-
-* id
-* equipment_name
-* equipment_category
-* location
-* unit_number
-* serial_number
-* model_type
-* brand
-* capacity
-* created_at
-* updated_at
-
-Tambahkan index yang diperlukan.
-
----
-
-## inspections
-
-Field:
-
-* id
-* survey_timestamp
-* equipment_id
-* inspector_id
-* inspection_type
-* inspection_result
-* recommendation
-* unit_photo
-* status
-
-Status:
-
-* Draft
-* Submitted
-* Approved
-* Rejected
-
-Tambahkan audit fields.
-
----
-
-## inspection_findings
-
-Field:
-
-* id
-* inspection_id
-* finding_number
-* finding_description
-
----
-
-## inspection_photos
-
-Field:
-
-* id
-* inspection_id
-* finding_id nullable
-* photo_url
-* photo_type
-
-photo_type:
-
-* UNIT
-* FINDING
-
----
-
-# Import Excel
-
-Gunakan Laravel Excel.
-
-Buat fitur:
-
-## Upload File
-
-Format:
-
-xlsx
-xls
-csv
-
-## Validation
-
-* duplicate serial number
-* duplicate unit number
-* required fields
-* invalid format
-
-## Processing
-
-Gunakan Queue.
-
-Import besar tidak boleh timeout.
-
-Buat:
-
-ImportEquipmentJob
-
-## Import History
-
-Tabel:
-
-import_histories
-
-Field:
-
-* id
-* filename
-* total_rows
-* success_rows
-* failed_rows
-* status
-* started_at
-* finished_at
-* created_by
-
----
-
-# Dashboard
-
-Tampilkan:
-
-* total equipment
-* total inspections
-* total findings
-* inspections today
-* pending approvals
-* recent imports
-
-Gunakan Bootstrap Card.
-
----
-
-# Survey Module
-
-Flow:
-
-1. User pilih equipment.
-2. Isi hasil inspeksi.
-3. Tambah banyak temuan.
-4. Upload foto unit.
-5. Upload banyak foto temuan.
-6. Submit inspeksi.
-
-Gunakan dynamic form.
-
-Temuan tidak dibatasi jumlahnya.
-
----
-
-# Scalability
-
-Rancang sistem agar siap berkembang.
-
-Persiapkan:
-
 * Repository Pattern
-* Queue
-* Event Driven Design
-* Domain Service
-* Caching dengan Redis
-* API Ready
-* Audit Logging
-* Soft Delete
-* Pagination
-* Search & Filter
-
-Namun implementasi awal fokus pada:
-
-* Import Equipment
-* Inspection Management
-* Authentication
-* Dashboard
-
----
-
-# Code Quality
-
-Wajib:
-
-* SOLID Principle
-* Clean Code
-* Type Hinting
-* DTO
-* Form Request Validation
-* Service Provider Binding
-* Unit Test
-* Feature Test
-
-Jangan gunakan business logic di Controller.
-
-Buatkan:
-
-* Migration
-* Model
-* Repository Interface
-* Repository Implementation
 * DTO
 * Use Case
-* Service
-* Controller
-* Request Validation
+* Service Layer
 * Policy
-* Seeder
-* Docker Configuration
+* Laravel
+* PostgreSQL
+* UUID
+* Soft Delete
 
-Berikan source code lengkap dan production-ready.
+---
+
+# Business Structure
+
+Struktur organisasi baru:
+
+Industry
+↓
+Company
+↓
+Area
+↓
+Equipment Category
+↓
+Inspection Assignment
+↓
+Equipment
+↓
+Inspection
+↓
+Finding
+↓
+File
+
+---
+
+# Role Responsibility
+
+## Super Admin
+
+Bertanggung jawab terhadap:
+
+* User Management
+* Role Management
+* Permission Management
+* Equipment Category Management
+* System Configuration
+
+Tidak melakukan inspeksi.
+
+---
+
+## Admin
+
+Bertanggung jawab terhadap:
+
+* Industry Management
+* Company Management
+* Area Management
+* Equipment Monitoring
+* Assignment Monitoring
+* Reporting
+
+---
+
+## Supervisor
+
+Bertanggung jawab terhadap:
+
+* Membuat Assignment Inspeksi
+* Menentukan Category yang harus diperiksa
+* Menentukan Area yang harus diperiksa
+* Menentukan Inspector
+* Monitoring Progress
+* Review Inspection
+* Approve Inspection
+* Reject Inspection
+
+---
+
+## Inspector
+
+Bertanggung jawab terhadap:
+
+* Menjalankan Assignment
+* Menginput Equipment
+* Menentukan Lokasi Aktual
+* Mengisi Nomor Unit
+* Mengisi Serial Number
+* Mengisi Model / Type
+* Mengisi Brand
+* Mengisi Capacity
+* Menginput Temuan
+* Mengupload Foto
+* Submit Inspection
+
+Inspector tidak boleh:
+
+* Membuat Industry
+* Membuat Company
+* Membuat Area
+* Membuat Category
+
+---
+
+# Database Refactor
+
+Tambahkan tabel:
+
+industries
+
+* id
+* code
+* name
+
+companies
+
+* id
+* industry_id
+* code
+* name
+
+areas
+
+* id
+* company_id
+* code
+* name
+
+equipment_categories
+
+* id
+* code
+* name
+
+inspection_assignments
+
+* id
+
+* industry_id
+
+* company_id
+
+* area_id
+
+* category_id
+
+* inspector_id
+
+* supervisor_id
+
+* due_date
+
+* status
+
+status:
+
+Draft
+Assigned
+In Progress
+Completed
+Approved
+Rejected
+
+---
+
+# Equipment Refactor
+
+Equipment sekarang harus terkait dengan:
+
+* industry
+* company
+* area
+* category
+
+Jangan berdiri sendiri.
+
+---
+
+# Inspection Refactor
+
+Inspection harus berasal dari assignment.
+
+inspection
+
+* assignment_id
+
+* equipment_id
+
+* inspection_date
+
+* inspection_result
+
+* recommendation
+
+* status
+
+---
+
+# Dashboard Refactor
+
+Super Admin
+
+* Total User
+* Total Category
+* Total Inspection
+
+Admin
+
+* Total Industry
+* Total Company
+* Total Area
+* Total Inspection
+
+Supervisor
+
+* Assignment Pending
+* Assignment Progress
+* Inspection Waiting Approval
+
+Inspector
+
+* My Assignment
+* Completed Assignment
+* Pending Assignment
+
+---
+
+# Sidebar Refactor
+
+Super Admin
+
+* Dashboard
+* Users
+* Roles
+* Categories
+* Settings
+
+Admin
+
+* Dashboard
+* Industries
+* Companies
+* Areas
+* Assignments
+* Reports
+
+Supervisor
+
+* Dashboard
+* Assignments
+* Review Inspections
+* Reports
+
+Inspector
+
+* Dashboard
+* My Assignments
+* My Inspections
+
+---
+
+# Required Output
+
+Refactor seluruh Entity, Repository, DTO, UseCase, Service, Policy, Migration, Seeder, Dashboard, Menu Builder, dan Permission System agar mengikuti business flow baru tanpa melanggar Clean Architecture.
+
+Pastikan perubahan kompatibel dengan modul File Management dan Image Service yang sudah ada.

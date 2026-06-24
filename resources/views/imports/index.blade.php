@@ -29,7 +29,8 @@
                     <th>Status</th>
                     <th>Success</th>
                     <th>Failed</th>
-                    <th>Started</th>
+                    <th>Submitted</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -39,7 +40,22 @@
                         <td>{{ $history->status }}</td>
                         <td>{{ $history->success_rows }}</td>
                         <td>{{ $history->failed_rows }}</td>
-                        <td>{{ optional($history->started_at)->format('Y-m-d H:i') }}</td>
+                        <td>{{ optional($history->created_at)->format('Y-m-d H:i') }}</td>
+                        <td>
+                            @if(auth()->user()->hasRole('Super Admin'))
+                                @if($history->status === 'Pending Review')
+                                    <a href="{{ route('imports.show', $history->id) }}" class="btn btn-sm btn-outline-primary">Review</a>
+                                @elseif($history->status === 'Rejected')
+                                    <a href="{{ route('imports.show', $history->id) }}" class="btn btn-sm btn-outline-secondary">View</a>
+                                @elseif($history->status === 'Completed')
+                                    <a href="{{ route('imports.show', $history->id) }}" class="btn btn-sm btn-outline-success">Details</a>
+                                @else
+                                    <a href="{{ route('imports.show', $history->id) }}" class="btn btn-sm btn-outline-info">Details</a>
+                                @endif
+                            @else
+                                <span class="text-muted">No actions</span>
+                            @endif
+                        </td>
                     </tr>
                 @endforeach
             </tbody>

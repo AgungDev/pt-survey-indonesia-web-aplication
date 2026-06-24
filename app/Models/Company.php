@@ -7,41 +7,24 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Equipment extends Model
+class Company extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
 
     public $incrementing = false;
     protected $keyType = 'string';
-    protected $table = 'equipments';
+    protected $table = 'companies';
 
     protected $fillable = [
         'industry_id',
-        'company_id',
-        'equipment_name',
-        'equipment_category',
-        'location',
-        'unit_number',
-        'serial_number',
-        'model_type',
-        'brand',
-        'capacity',
+        'name',
+        'description',
         'created_by',
     ];
-
-    public function inspections()
-    {
-        return $this->hasMany(Inspection::class);
-    }
 
     public function industry()
     {
         return $this->belongsTo(Industry::class);
-    }
-
-    public function company()
-    {
-        return $this->belongsTo(Company::class);
     }
 
     public function creator()

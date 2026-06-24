@@ -4,7 +4,6 @@ namespace App\Application\UseCases;
 
 use App\Application\DTOs\ImportEquipmentDTO;
 use App\Domain\Repositories\ImportHistoryRepositoryInterface;
-use App\Jobs\ImportEquipmentJob;
 use Illuminate\Support\Facades\Storage;
 
 class ImportEquipmentUseCase
@@ -16,19 +15,18 @@ class ImportEquipmentUseCase
 
     public function execute(ImportEquipmentDTO $dto): string
     {
-        $filePath = $dto->file->store('imports');
+        $filePath = Storage::disk('local')->putFile('imports', $dto->file);
 
         $history = $this->historyRepository->create([
             'filename' => $dto->file->getClientOriginalName(),
+            'file_path' => $filePath,
             'total_rows' => 0,
             'success_rows' => 0,
             'failed_rows' => 0,
-            'status' => 'Pending',
+            'status' => 'Pending Review',
             'started_at' => now(),
             'created_by' => $dto->uploadedBy,
         ]);
-
-        ImportEquipmentJob::dispatch($history->id, $filePath);
 
         return $history->id;
     }

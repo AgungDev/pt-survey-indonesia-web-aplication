@@ -17,10 +17,17 @@ class ImportHistory extends Model
 
     protected $fillable = [
         'filename',
+        'file_path',
         'total_rows',
         'success_rows',
         'failed_rows',
         'status',
+        'approved_by',
+        'approved_at',
+        'industry_id',
+        'company_id',
+        'review_comment',
+        'reviewed_at',
         'started_at',
         'finished_at',
         'created_by',
@@ -29,6 +36,8 @@ class ImportHistory extends Model
     protected $casts = [
         'started_at' => 'datetime',
         'finished_at' => 'datetime',
+        'approved_at' => 'datetime',
+        'reviewed_at' => 'datetime',
     ];
 
     public function creator()

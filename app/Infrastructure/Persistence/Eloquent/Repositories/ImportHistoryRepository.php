@@ -12,6 +12,11 @@ class ImportHistoryRepository implements ImportHistoryRepositoryInterface
         return ImportHistory::create($data);
     }
 
+    public function find(string $id): ?ImportHistory
+    {
+        return ImportHistory::find($id);
+    }
+
     public function updateStatus(string $id, array $data): bool
     {
         $record = ImportHistory::find($id);

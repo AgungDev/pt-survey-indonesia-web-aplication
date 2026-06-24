@@ -3,14 +3,20 @@
 namespace App\Providers;
 
 use App\Domain\Repositories\EquipmentRepositoryInterface;
+use App\Domain\Repositories\CompanyRepositoryInterface;
 use App\Domain\Repositories\ImportHistoryRepositoryInterface;
+use App\Domain\Repositories\IndustryRepositoryInterface;
+use App\Domain\Repositories\InspectionApprovalRepositoryInterface;
 use App\Domain\Repositories\InspectionFindingRepositoryInterface;
 use App\Domain\Repositories\InspectionPhotoRepositoryInterface;
 use App\Domain\Repositories\InspectionRepositoryInterface;
 use App\Domain\Repositories\RoleRepositoryInterface;
 use App\Domain\Repositories\UserRepositoryInterface;
+use App\Infrastructure\Persistence\Eloquent\Repositories\CompanyRepository;
 use App\Infrastructure\Persistence\Eloquent\Repositories\EquipmentRepository;
 use App\Infrastructure\Persistence\Eloquent\Repositories\ImportHistoryRepository;
+use App\Infrastructure\Persistence\Eloquent\Repositories\IndustryRepository;
+use App\Infrastructure\Persistence\Eloquent\Repositories\InspectionApprovalRepository;
 use App\Infrastructure\Persistence\Eloquent\Repositories\InspectionFindingRepository;
 use App\Infrastructure\Persistence\Eloquent\Repositories\InspectionPhotoRepository;
 use App\Infrastructure\Persistence\Eloquent\Repositories\InspectionRepository;
@@ -37,7 +43,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(InspectionRepositoryInterface::class, InspectionRepository::class);
         $this->app->bind(InspectionFindingRepositoryInterface::class, InspectionFindingRepository::class);
         $this->app->bind(InspectionPhotoRepositoryInterface::class, InspectionPhotoRepository::class);
+        $this->app->bind(InspectionApprovalRepositoryInterface::class, InspectionApprovalRepository::class);
         $this->app->bind(ImportHistoryRepositoryInterface::class, ImportHistoryRepository::class);
+        $this->app->bind(IndustryRepositoryInterface::class, IndustryRepository::class);
+        $this->app->bind(CompanyRepositoryInterface::class, CompanyRepository::class);
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
 
         $this->app->singleton(ThemeService::class, fn () => new ThemeService(config('themes', [])));

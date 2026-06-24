@@ -42,6 +42,7 @@ fi
 
 echo "[Entrypoint] Running database migrations"
 php artisan migrate --force
+php artisan migrate --force --path=database/migrations/0001_01_09_add_import_history_file_path_column.php
 
 echo "[Entrypoint] Seeding database"
 php artisan db:seed --force

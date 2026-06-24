@@ -27,13 +27,28 @@ class ImportEquipmentJob implements ShouldQueue
         ImportHistoryRepositoryInterface $historyRepository,
         EquipmentRepositoryInterface $equipmentRepository,
     ): void {
+        $history = $historyRepository->find($this->historyId);
+
+        if (!$history) {
+            return;
+        }
+
         $historyRepository->updateStatus($this->historyId, [
             'status' => 'Processing',
             'started_at' => now(),
         ]);
 
         try {
-            Excel::import(new EquipmentImport($historyRepository, $equipmentRepository, $this->historyId), Storage::path($this->filePath));
+            Excel::import(
+                new EquipmentImport(
+                    $historyRepository,
+                    $equipmentRepository,
+                    $this->historyId,
+                    $history->industry_id,
+                    $history->company_id
+                ),
+                Storage::path($this->filePath)
+            );
 
             $historyRepository->updateStatus($this->historyId, [
                 'status' => 'Completed',
