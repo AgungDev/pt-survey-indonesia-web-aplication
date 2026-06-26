@@ -7,3 +7,4 @@ storage/*.key
 .env.*.local
 npm-debug.log
 yarn-error.log
+storage/app/private

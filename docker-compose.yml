@@ -24,15 +24,43 @@ services:
       DB_DATABASE: survey
       DB_USERNAME: survey_user
       DB_PASSWORD: survey_password
-      REDIS_HOST: redis
-      QUEUE_CONNECTION: redis
+      QUEUE_CONNECTION: database
       SESSION_DRIVER: database
-      CACHE_STORE: redis
+      CACHE_STORE: database
       FILESYSTEM_DISK: public
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
+    networks:
+      - app-network
+
+  worker:
+    image: pt-survey-indonesia-app
+    container_name: pt-survey-indonesia-worker
+    restart: unless-stopped
+    working_dir: /var/www/html
+    command: ["php", "artisan", "queue:work", "database", "--queue=default", "--sleep=3", "--tries=3", "--timeout=90"]
+    volumes:
+      - ./:/var/www/html
+      - ./vendor:/var/www/html/vendor
+      - ./node_modules:/var/www/html/node_modules
+      - ./storage:/var/www/html/storage
+    environment:
+      APP_ENV: local
+      APP_DEBUG: 'true'
+      APP_URL: http://localhost
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: survey
+      DB_USERNAME: survey_user
+      DB_PASSWORD: survey_password
+      QUEUE_CONNECTION: database
+      SESSION_DRIVER: database
+      CACHE_STORE: database
+      FILESYSTEM_DISK: public
+    depends_on:
+      postgres:
         condition: service_healthy
     networks:
       - app-network
@@ -63,19 +91,6 @@ services:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U survey_user']
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - app-network
-
-  redis:
-    image: redis:7-alpine
-    container_name: pt-survey-indonesia-redis
-    restart: unless-stopped
-    command: ["redis-server", "--save", "", "--appendonly", "no"]
-    healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
       timeout: 5s
       retries: 5

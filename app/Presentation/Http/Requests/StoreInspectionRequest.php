@@ -3,6 +3,7 @@
 namespace App\Presentation\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class StoreInspectionRequest extends FormRequest
 {
@@ -13,7 +14,7 @@ class StoreInspectionRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'equipment_id' => ['required', 'uuid', 'exists:equipments,id'],
             'survey_timestamp' => ['required', 'date'],
             'inspection_type' => ['required', 'string', 'max:100'],
@@ -25,5 +26,11 @@ class StoreInspectionRequest extends FormRequest
             'finding_photos' => ['nullable', 'array'],
             'finding_photos.*.*' => ['nullable', 'image', 'max:10240'],
         ];
+
+        if (! Auth::user()->hasRole('Inspector')) {
+            $rules['inspector_id'] = ['required', 'uuid', 'exists:users,id'];
+        }
+
+        return $rules;
     }
 }

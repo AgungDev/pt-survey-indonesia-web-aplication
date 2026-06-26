@@ -56,7 +56,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/imports/{id}/approve', [ImportController::class, 'approve'])->name('imports.approve');
         Route::post('/imports/{id}/reject', [ImportController::class, 'reject'])->name('imports.reject');
 
-        Route::view('/users', 'pages.users.index')->name('users.index');
+        Route::get('/users', [App\Presentation\Http\Controllers\UserController::class, 'index'])->name('users.index');
+        Route::post('/users', [App\Presentation\Http\Controllers\UserController::class, 'store'])->name('users.store');
+        Route::put('/users/{id}', [App\Presentation\Http\Controllers\UserController::class, 'update'])->name('users.update');
+        Route::post('/users/{id}/password', [App\Presentation\Http\Controllers\UserController::class, 'updatePassword'])->name('users.updatePassword');
+        Route::post('/users/{id}/role', [App\Presentation\Http\Controllers\UserController::class, 'updateRole'])->name('users.updateRole');
         Route::view('/roles', 'pages.roles.index')->name('roles.index');
         Route::view('/settings', 'pages.settings.index')->name('settings.index');
     });

@@ -7,6 +7,7 @@ use App\Application\UseCases\ApproveInspectionUseCase;
 use App\Application\UseCases\CreateInspectionUseCase;
 use App\Domain\Repositories\EquipmentRepositoryInterface;
 use App\Domain\Repositories\InspectionRepositoryInterface;
+use App\Models\User;
 use App\Presentation\Http\Requests\StoreInspectionRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,7 +32,7 @@ class InspectionController extends Controller
             $filters['status'] = $request->input('status');
         }
 
-        if (Auth::user()->role?->name === 'Inspector') {
+        if (Auth::user()->hasRole('Inspector')) {
             $filters['inspector_id'] = Auth::id();
         }
 
@@ -54,16 +55,27 @@ class InspectionController extends Controller
     public function create()
     {
         $equipments = $this->equipmentRepository->all();
+        $inspectors = null;
 
-        return View::make('inspections.create', compact('equipments'));
+        if (! Auth::user()->hasRole('Inspector')) {
+            $inspectors = User::whereHas('role', function ($query) {
+                $query->where('name', 'Inspector');
+            })->orderBy('name')->get();
+        }
+
+        return View::make('inspections.create', compact('equipments', 'inspectors'));
     }
 
     public function store(StoreInspectionRequest $request)
     {
+        $inspectorId = Auth::user()->hasRole('Inspector')
+            ? Auth::id()
+            : $request->input('inspector_id');
+
         $dto = new CreateInspectionDTO(
             surveyTimestamp: $request->input('survey_timestamp'),
             equipmentId: $request->input('equipment_id'),
-            inspectorId: Auth::id(),
+            inspectorId: $inspectorId,
             inspectionType: $request->input('inspection_type'),
             inspectionResult: $request->input('inspection_result'),
             recommendation: $request->input('recommendation'),

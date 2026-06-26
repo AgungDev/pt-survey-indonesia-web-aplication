@@ -41,6 +41,18 @@
                                         @endforeach
                                     </select>
                                 </div>
+
+                                @if(! Auth::user()->hasRole('Inspector'))
+                                    <div class="mb-3">
+                                        <label class="form-label">Assign inspector</label>
+                                        <select name="inspector_id" class="form-select" required>
+                                            <option value="">Choose inspector</option>
+                                            @foreach($inspectors as $inspector)
+                                                <option value="{{ $inspector->id }}" {{ old('inspector_id') === $inspector->id ? 'selected' : '' }}>{{ $inspector->name }} ({{ $inspector->email }})</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @endif
                                 <div class="mb-3">
                                     <label class="form-label">Inspection type</label>
                                     <input name="inspection_type" type="text" class="form-control" value="{{ old('inspection_type') }}" placeholder="Example: Routine Safety Check" required>

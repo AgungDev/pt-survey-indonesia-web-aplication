@@ -29,6 +29,7 @@ RUN composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-gd
 
 COPY . ./
 COPY docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY docker/php-fpm-pool.conf /usr/local/etc/php-fpm.d/zzz-custom-pool.conf
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 # Install JS dependencies and build assets after source files are present
 RUN npm install --legacy-peer-deps && npm run build || true

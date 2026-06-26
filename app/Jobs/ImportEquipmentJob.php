@@ -4,12 +4,14 @@ namespace App\Jobs;
 
 use App\Domain\Repositories\EquipmentRepositoryInterface;
 use App\Domain\Repositories\ImportHistoryRepositoryInterface;
+use App\Domain\Repositories\UserRepositoryInterface;
 use App\Infrastructure\Excel\EquipmentImport;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -26,6 +28,7 @@ class ImportEquipmentJob implements ShouldQueue
     public function handle(
         ImportHistoryRepositoryInterface $historyRepository,
         EquipmentRepositoryInterface $equipmentRepository,
+        UserRepositoryInterface $userRepository,
     ): void {
         $history = $historyRepository->find($this->historyId);
 
@@ -43,6 +46,7 @@ class ImportEquipmentJob implements ShouldQueue
                 new EquipmentImport(
                     $historyRepository,
                     $equipmentRepository,
+                    $userRepository,
                     $this->historyId,
                     $history->industry_id,
                     $history->company_id
@@ -55,9 +59,17 @@ class ImportEquipmentJob implements ShouldQueue
                 'finished_at' => now(),
             ]);
         } catch (\Throwable $exception) {
+            Log::error('ImportEquipmentJob failed', [
+                'historyId' => $this->historyId,
+                'filePath' => $this->filePath,
+                'message' => $exception->getMessage(),
+                'exception' => $exception,
+            ]);
+
             $historyRepository->updateStatus($this->historyId, [
                 'status' => 'Failed',
                 'finished_at' => now(),
+                'review_comment' => $exception->getMessage(),
             ]);
         }
     }
